@@ -1,0 +1,209 @@
+#include <stdio.h>
+#include <stdlib.h>
+typedef struct LNode{
+	int data;
+	struct LNode *next; 
+}LNode,*LinkList;
+
+LNode* InitList(LinkList &L)
+{
+	L = (LNode*)malloc(sizeof(LNode));
+	if(L == NULL)
+	{
+		printf("分配空间失败");
+		exit(1); 
+    }
+	L->next = NULL;
+	return L;
+}
+
+LNode* CreatList(LinkList &L)
+{
+	int a;
+	int n;
+	printf("输入要创建的元素个数n:");
+	scanf("%d",&n); 
+	int i;
+	LinkList P;
+	LinkList Last;
+	Last = L;
+	for(i = 0;i < n;i++)
+	{
+		P = (LNode*)malloc(sizeof(LNode));
+		printf("输入数据:");
+		scanf("%d",&a);
+		P->data = a;
+		Last->next = P;
+		P->next = NULL;
+		Last = P;
+		printf("第%d个元素创建完毕\n",i+1);
+	}
+	return L; 
+}
+
+int GetLinkListLength(LinkList L)
+{
+	int i = 0;
+	LNode *A;
+	A = L;
+	while (A->next!=NULL)
+	{
+		i++;
+		A = A->next;
+	} 
+	return i;
+}
+
+int GetLinkListValue (LinkList L,int i)
+{
+	int a;
+	int j;
+	LNode *B;
+	B = L->next;
+	for (j = 1;j < i;j++)
+	{
+		B = B->next;
+	}
+	a = B->data;
+	return a;
+}
+
+LNode* LinkListInsert(LinkList &L,int length)
+{
+	int i,k,l;
+	int j;
+	LNode *P,*C;
+	P = L;
+	printf("输入1进行插入，输入其他数字结束插入：");
+	scanf("%d",&k);
+	while(k == 1)
+	{
+		printf("请输入要插入元素的位置i：");
+		scanf("%d",&i);
+		while(i < 1||i > length)
+		{
+			printf("查找位置不合法,重新输入；");
+			scanf("%d",&i); 
+		}
+		for(j = 0;j < i-1;j++)
+		{
+			P = P->next;
+		}
+		C = (LNode*)malloc(sizeof(LNode));
+		printf("输入插入元素的值:");
+		scanf("%d",&l);
+		C->data = l;
+		C->next = P->next;
+		P->next = C;
+		P = L;
+		printf("插入完成，请再次输入：");
+		scanf("%d",&k);
+	}
+	printf("元素插入已完成\n\n");
+	return L;
+}
+
+LNode* LinkListDelete(LinkList &L,int length)
+{
+	int i,k;
+	LNode *F,*D;
+	F = L;
+	printf("输入1进行删除，输入其他数字退出删除");
+	scanf("%d",&k); 
+	while (k == 1)
+	{
+		printf("输入要删除元素的位置i");
+		scanf("%d",&i);
+		while (i < 1||i > length)
+		{
+			printf("删除位置不合法，重新删除：");
+			scanf("%d",&i); 
+		}
+		for(int j = 0;j < i-1;j++)
+		{
+			F = F->next;
+		}
+		D = F->next;
+		F->next = D->next;
+		D->next = NULL;
+		free(D);
+		F = L;
+		printf("删除操作已完成，继续输入:");
+		scanf("%d",&k);
+	}
+	return L;
+}
+
+void PrintLinkList (LinkList L,int length)
+{
+	int i;
+	LNode *D;
+	D = L;
+	printf("当前链表的数据域分别为\n");
+	for(i = 0;i < length;i++)
+	{
+		D = D->next;
+		printf("%d\n",D->data);
+	}
+}
+
+int Menu()
+{
+	printf("1.构造空的链表\n");
+	printf("2.建立含有若干数据元素的链表\n");
+	printf("3.求表长\n");
+	printf("4.获取第i个元素的值\n");
+	printf("5.数据元素的插入\n");
+	printf("6.数据元素删除\n");
+	printf("7.输出单链表\n");
+	printf("提示：2.5.6三个操作进行后要进行3操作更新表长才能进行后继操作！！\n"); 
+	printf("请输入你的选择(1-7):");
+}
+int main()
+{
+	int a;
+	int length;
+	LinkList L;
+	int q;
+	Menu();
+	scanf("%d",&q);
+	while (q < 1 && q > 7)
+	{
+		printf("输入错误重新输入\n");
+		scanf("%d",&q);
+	}
+	while (1)
+	{
+	switch (q)
+	{
+		case 1: L = InitList(L);
+		        if(L!=NULL)
+		        {
+		        	printf("链表初始化完成\n\n");
+				}
+				break;
+		case 2: L = CreatList(L);
+		        printf("链表元素创建完成\n\n"); 
+				break;
+		case 3: length = GetLinkListLength(L);
+		        printf("所求表的长度为%d\n\n",GetLinkListLength(L));
+		        break;
+		case 4: printf("请输入要获得的链表元素位置i\n");
+	            int i;
+		        scanf("%d",&i);
+		        printf("链表第%d个位置元素值为%d\n\n",i,GetLinkListValue(L,i));
+		        break;
+		case 5: L = LinkListInsert(L,length);
+		        break;
+		case 6: L = LinkListDelete(L,length);
+		        printf("删除完成\n\n");
+				break;
+		case 7: PrintLinkList(L,length);
+		        printf("单链表输出完成\n\n");
+				break;
+		default: break; 
+    }
+    Menu();
+    scanf("%d",&q);
+    }
+}
