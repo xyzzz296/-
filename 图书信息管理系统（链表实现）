@@ -1,1 +1,311 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define OK 1
 
+typedef struct{
+	long ISBN;
+	char bookname[25];
+	int price; 
+}BOOK;
+
+typedef struct LNode{
+	BOOK book;
+	struct LNode *next;
+}LNode,*LinkList;
+
+//得到指定数量的图书的信息
+int GetBookInformation(LinkList &L)
+{
+	LinkList P = L; 
+	int i;
+	printf("输入要从文件中获得的图书信息数量i:");
+	scanf("%d",&i);
+	FILE *fp;
+	if ((fp = fopen("D:\\book.txt","r")) == NULL)
+	{
+		printf("Failure to open book.txt! \n");
+		exit(0);
+	}
+	for (int j = 0;j < i;j++)
+	{
+		P = P->next;
+		fscanf(fp,"%10ld\t",&P->book.ISBN);
+		fscanf(fp,"%20s\t\t\t",P->book.bookname);
+		fscanf(fp,"%d\n",&P->book.price);
+	}
+	fclose(fp);
+	return OK;
+	//for (i = 0;i < 4;i++)
+	//{
+	//	printf("%10ld%20s%d\n",book[i].ISBN,book[i].bookname,book[i].price);
+	//} 
+}
+
+//链表初始化函数
+int InitList(LinkList &L)
+{
+	L = (LNode*)malloc(sizeof(LNode));
+	if(L == NULL)
+	{
+		printf("分配空间失败");
+		exit(1); 
+	}
+	L->next = NULL;
+	return OK;
+}
+
+//链表创建
+int LinkListCreat(LinkList &L)
+{
+	int i;
+	printf("输入要创建的结点个数：");
+	scanf("%d",&i);
+	LinkList P;
+	LinkList Last;
+	Last = L;
+	for(int j = 0;j < i;j++)
+	{
+        P = (LNode*)malloc(sizeof(LNode));
+		Last->next = P;
+		P->next = NULL;
+		Last = P;
+	}
+	return OK; 
+ } 
+//查找函数（依照给定数据进行查找，返回对应位置的下标）
+int LinkListFind(LinkList L)
+{
+	int i;
+	int k = 1;
+	LinkList F;
+	F = L->next;
+	printf("输入 1 以ISBN号进行查找，输入 2 以书名进行查找，输入 3 以书籍定价进行查找");
+	scanf("%d",&i);
+	if(i == 1)
+	{
+	    int I;
+		printf("输入想要查找的ISBN号");
+		scanf("%ld",&I);
+		while(F->book.ISBN != I)
+		{
+			F = F->next;
+			k++;
+		}
+		return k;
+	}
+	else if(i == 2)
+	{
+		char N[25];
+		printf("输入要查找的书名:");
+		getchar(); 
+		gets(N);
+		while(strcmp(N,F->book.bookname) != 0)
+		{
+			F = F->next;
+			k++;
+			if(F->next == NULL)
+			{
+				break;
+			}
+		}
+		if(strcmp(N,F->book.bookname) == 0)
+		{
+			return k;
+		}
+		else
+		{
+			printf("//查找的书籍未找到\n\n"); 
+			return 0;
+		}
+	}
+	else
+    {
+    	int n;
+    	printf("输入要查找的书籍定价");
+		scanf("%d",&n);
+		while(n != F->book.price)
+		{
+			F = F->next;
+			k++;
+		} 
+        return k;  
+    }
+}  
+
+//表中第i个位置插入新元素
+int LinkListInsert(LinkList &L)
+{
+	int i,a;
+	LinkList I,P;
+	I = L;
+	printf("输入 1 进行元素插入，输入其他结束插入");
+	scanf("%d",&a);
+	while(a == 1)
+	{
+		printf("输入要插入元素的位置");
+	    scanf("%d",&i);
+	    for(int j = 0;j < i-1;j++)
+	    {
+		    I = I->next;
+	    }
+	    P = (LNode*)malloc(sizeof(LNode));
+	    printf("输入要插入图书的书名");
+	    getchar(); 
+		gets(P->book.bookname); 
+	    printf("输入要插入图书的ISBN");
+		scanf("%ld",&P->book.ISBN);
+		printf("输入要插入图书的定价");
+		scanf("%d",&P->book.price);
+		P->next = I->next;
+		I->next = P;
+		printf("图书信息插入完成,请再次输入（1或其他）");
+		scanf("%d",&a);
+	}
+	return OK; 
+} 
+
+//数据元素的删除
+int LinkListDelete(LinkList &L)
+{
+	int a,i;
+	LinkList F,D;
+	F = L;
+	printf("输入 1 进行元素删除，输入其他结束插入");
+	scanf("%d",&a);
+	while(a == 1)
+	{
+		printf("输入要删除元素的位置");
+		scanf("%d",&i);
+		for(int j = 0;j < i - 1;j++)
+		{
+			F = F->next;
+		}
+		D = F->next;
+		F->next = D->next;
+		D->next = NULL;
+		free(D);
+		F = L;
+		printf("删除操作已完成，请再次输入");
+		scanf("%d",&a); 
+	}
+	return OK; 
+} 
+
+//图书信息输出
+void PrintLinkList(LinkList L)
+{
+	LinkList F;
+	F = L;
+	printf("图书的ISBN，书名，定价分别为\n");
+	while(F->next != NULL) 
+	{
+		F = F->next;
+		printf("%10ld\t%20s\t%d\n",F->book.ISBN,F->book.bookname,F->book.price);
+    }
+} 
+
+//冒泡法对ISBN由小到大排序
+int LinkListSort(LinkList L)
+{
+	LinkList A,B,C;
+	LinkList E;
+	LinkList temp;
+	E = NULL;
+	while(L->next != E)
+	{
+		for(A = L,B = A->next,C = B->next;C != E;A = A->next,B = B->next,C = C->next)
+		{
+			if(B->book.ISBN > C->book.ISBN)
+			{
+				B->next = C->next;
+				A->next = C;
+				C->next = B;
+				temp = C;
+				C = B;
+				B = temp;
+			}
+		}
+		E = B;
+	} 
+	return OK;
+}
+
+//菜单函数
+int Menu()
+{
+	printf("1.链表初始化\n");
+	printf("2.从文件得到指定数量的图书信息\n");
+	printf("3.依据给定信息查找\n");
+	printf("4.在表中第i个位置插入元素\n");
+	printf("5.数据元素删除\n"); 
+	printf("6.图书信息输出\n");
+	printf("7.依据ISBN码将图书信息排序（小到大）\n");
+	printf("8.创建链表\n");
+	printf("输入你的选择：");
+}
+//主函数	 
+int main()
+{
+	int i,a;
+	int b;
+	LinkList L;
+	Menu();
+	scanf("%d",&i);
+	while(i < 1 || i > 7)
+	{
+		printf("输入数据错误，重新输入:");
+		scanf("%d",&i); 
+	}
+	while(1)
+	{
+		switch(i)
+		{
+			case 1: a = InitList(L);
+			        if(a == 1)
+			        {
+			        	printf("//链表初始化完成\n\n");
+					}
+			        a = 0;
+			        break;
+		    case 2: a = GetBookInformation(L);
+		            if(a == 1)
+		            {
+		            	printf("//图书信息获取成功\n\n"); 
+					}
+			        a = 0;
+			        break; 
+			case 3: b = LinkListFind(L);
+			        if(b == 0)
+			        {
+						break; 
+					} 
+			        printf("//书籍查找成功,查找位置的标号为%d\n\n",b);
+			        break;
+			case 4: a = LinkListInsert(L);
+			        if(a == 1)
+			        {
+			        	printf("//图书信息插入完成\n\n");
+					}
+			        break;
+			case 5: a = LinkListDelete(L);
+			        if(a == 1)
+			        {
+			        	printf("//图书信息删除完成\n\n"); 
+					}
+					a = 0;
+					break;
+			case 6: PrintLinkList(L);
+			        break;
+			        printf("//链表元素输出完成\n\n"); 
+	        case 7: LinkListSort(L);
+			        printf("//链表排序完成\n\n");
+			        break;
+			case 8: LinkListCreat(L);
+			        printf("//链表创建完成\n\n");
+					break;	
+		}
+		Menu();
+		scanf("%d",&i);
+    }
+}
