@@ -2,13 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #define OK 1
-
 typedef struct{
 	long ISBN;
 	char bookname[25];
 	int price; 
 }BOOK;
-
 typedef struct LNode{
 	BOOK book;
 	struct LNode *next;
